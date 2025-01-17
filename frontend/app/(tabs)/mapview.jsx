@@ -1,6 +1,8 @@
 import {
   ActivityIndicator,
   Button,
+  Linking,
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -16,6 +18,7 @@ const MapViewScreen = () => {
   const [location, setLocation] = useState(null);
   const [supermarkets, setSupermarkets] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState();
 
   const fetchSupermarkets = async () => {
     setLoading(true);
@@ -41,6 +44,7 @@ const MapViewScreen = () => {
     React.useCallback(() => {
       async function getCurrentLocation() {
         let { status } = await Location.requestForegroundPermissionsAsync();
+        setStatus(status);
 
         if (status !== "granted") {
           alert("Permission to access location was denied!");
@@ -73,6 +77,24 @@ const MapViewScreen = () => {
       fetchSupermarkets();
     }, [])
   );
+
+  if (status !== "granted") {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Button
+          onPress={() => {
+            if (Platform.OS === "android") {
+              Linking.openSettings();
+            } else if (Platform.OS === "ios") {
+              Linking.openURL("app-settings:");
+            }
+          }}
+          title="Request Location Permission"
+          color={"#F5B01C"}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

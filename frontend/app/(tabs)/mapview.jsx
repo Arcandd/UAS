@@ -1,4 +1,10 @@
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import MapView, { Callout, Marker } from "react-native-maps";
 import * as Location from "expo-location";
@@ -8,7 +14,6 @@ import { collection, getDocs } from "firebase/firestore";
 
 const MapViewScreen = () => {
   const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
   const [supermarkets, setSupermarkets] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -38,8 +43,15 @@ const MapViewScreen = () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
 
         if (status !== "granted") {
-          setErrorMsg("Permission to access location was denied");
-          alert(errorMsg);
+          alert("Permission to access location was denied!");
+
+          return;
+        }
+
+        const isLocationEnabled = await Location.hasServicesEnabledAsync();
+
+        if (!isLocationEnabled) {
+          alert("Please turn on your location service!");
 
           return;
         }
@@ -54,7 +66,6 @@ const MapViewScreen = () => {
           });
         } catch (error) {
           console.error("Error fetching location:", error);
-          setErrorMsg("Failed to fetch location");
         }
       }
 
